@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/registration")
 public class RegistrationController {
 
-
     private final UserService userService;
 
     @Autowired
@@ -22,10 +21,8 @@ public class RegistrationController {
         this.userService = userService;
     }
 
-
     @PostMapping
     public boolean addUser(@RequestBody User user){
         return userService.addUser(user);
-
     }
 }

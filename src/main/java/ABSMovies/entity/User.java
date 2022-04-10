@@ -2,7 +2,6 @@ package ABSMovies.entity;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -36,7 +35,6 @@ public class User {
 
     public User() {
     }
-
 
     public Long getId() {
         return id;

@@ -1,10 +1,12 @@
 package ABSMovies.controller;
 
 import ABSMovies.entity.User;
-import ABSMovies.exception.ApiUserException;
 import ABSMovies.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
@@ -12,7 +14,7 @@ import java.util.Objects;
 @RequestMapping("/api/v1/login")
 public class LoginController {
 
-    UserService userService;
+    private final UserService userService;
 
     @Autowired
     public LoginController(UserService userService) {
@@ -22,7 +24,8 @@ public class LoginController {
     //Переписать
     @PostMapping
     public Boolean LoginUser(@RequestBody User user){
-            User userFromDB = userService.getUserFromDB(user);
+        User userFromDB = userService.getUserFromDB(user);
+
         return Objects.equals(userFromDB.getPassword(), user.getPassword());
     }
 

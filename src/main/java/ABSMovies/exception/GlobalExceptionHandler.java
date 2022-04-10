@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
                 status,
                 ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
         );
+
         return new ResponseEntity<>(apiException, status);
     }
 }

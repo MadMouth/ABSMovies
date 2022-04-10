@@ -4,7 +4,13 @@ import ABSMovies.entity.Favorite;
 import ABSMovies.entity.User;
 import ABSMovies.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
 
@@ -12,7 +18,7 @@ import java.util.Set;
 @RequestMapping("api/v1/user")
 public class UserController {
 
-    UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -33,13 +39,12 @@ public class UserController {
     }
 
     @GetMapping("/favorite")
-    public Set<Favorite> getFavorite(@RequestParam String email){
+    public Set<Long> getFavorite(@RequestParam String email){
         User user = new User();
         user.setEmail(email);
         User userFromDB = userService.getUserFromDB(user);
 
-        Set<Favorite> favorites = userService.getFavorite(userFromDB);
+        Set<Long> favorites = userService.getFavorite(userFromDB);
         return favorites;
     }
-
-    }
+}

@@ -8,9 +8,9 @@ import ABSMovies.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Service
 public class UserService {
@@ -24,14 +24,16 @@ public class UserService {
         this.favoriteRepository = favoriteRepository;
     }
 
-    public  User getUserFromDB(User user){
+    public User getUserFromDB(User user){
         return userRepository.getUserByEmail(user.getEmail())
-                .orElseThrow(() -> new ApiUserException("User with email " + user.getEmail() + " doesn't exist!"));
+                .orElseThrow(() ->
+                        new ApiUserException("User with email " + user.getEmail() + " doesn't exist!"));
     }
 
     public Boolean addUser(User user){
         userRepository.getUserByEmail(user.getEmail())
-                .ifPresent(userFromDB -> {throw new ApiUserException("user with email " + userFromDB.getEmail() + " is already exist!");});
+                .ifPresent(userFromDB ->
+                        {throw new ApiUserException("User with email " + userFromDB.getEmail() + " is already exist!");});
 
         userRepository.save(user);
         return true;
@@ -40,15 +42,12 @@ public class UserService {
     public Boolean addFavorite(User user, Long film_id){
 
         User userFromDB = getUserFromDB(user);
-        //Переписать
-        Optional<Set<Favorite>> optionalFavorites = Optional.ofNullable(userFromDB.getFavorites());
-            Stream<Favorite> streamFavorites = optionalFavorites
-                    .map(favorites -> favorites.stream()
-                            .filter(favorite -> favorite.getFilmId() == film_id)).get();
-            if (streamFavorites.findFirst().isPresent()){
-                throw new ApiUserException("This movie has already been added to the user's list!");
-            }
 
+        userFromDB.getFavorites()
+                .stream()
+                .filter(favorite -> favorite.getFilmId() == film_id)
+                .findFirst().ifPresent(favorite ->
+                    {throw new ApiUserException("Movie with ID " + favorite.getFilmId() + " has already been added to the user's list!");});
 
         if (favoriteRepository.getFavoriteByFilmId(film_id).isEmpty()){
            Favorite favorite = new Favorite();
@@ -56,8 +55,8 @@ public class UserService {
            favoriteRepository.save(favorite);
        }
 
-       Favorite favorite = favoriteRepository.getFavoriteByFilmId(film_id).get();
-       userFromDB.setFavorite(favorite);
+       Favorite favoriteFromDB = favoriteRepository.getFavoriteByFilmId(film_id).get();
+       userFromDB.setFavorite(favoriteFromDB);
        userRepository.save(userFromDB);
        return true;
     }
@@ -65,19 +64,25 @@ public class UserService {
     public Boolean deleteFavorite(User user, Long film_id){
 
         User userFromDB = getUserFromDB(user);
-        //Переписать
-        Set<Favorite> favoritesFromDB = userFromDB.getFavorites();
-        Optional<Favorite> favoriteRemove = favoriteRepository.getFavoriteByFilmId(film_id);
-        favoritesFromDB.remove(favoriteRemove.orElseThrow(()
-                -> new ApiUserException("This user doesn't have this movie!")));
-        userFromDB.setFavorites(favoritesFromDB);
+
+        Favorite favoriteFromDB = userFromDB.getFavorites()
+                .stream()
+                .filter(favorite -> favorite.getFilmId() == film_id)
+                .findFirst().orElseThrow(() -> new ApiUserException("The user doesn't have this movie!"));
+
+        userFromDB.getFavorites().remove(favoriteFromDB);
+
+        userFromDB.setFavorites(userFromDB.getFavorites());
+        userRepository.save(userFromDB);
         return true;
     }
 
-    public Set<Favorite> getFavorite(User user){
+    public Set<Long> getFavorite(User user){
         Set<Favorite> favorites = userRepository.getUserByEmail(user.getEmail())
                 .map(User::getFavorites).orElseThrow();
 
-        return favorites;
+        Set<Long> setOfFavorites = new HashSet<>();
+        favorites.forEach(favorite -> setOfFavorites.add(favorite.getFilmId()));
+        return setOfFavorites;
     }
 }
