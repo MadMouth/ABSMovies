@@ -21,7 +21,6 @@ public class ExceptionEntity {
         return message;
     }
 
-
     public HttpStatus getHttpStatus() {
         return httpStatus;
     }
