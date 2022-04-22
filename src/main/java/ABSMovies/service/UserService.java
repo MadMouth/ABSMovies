@@ -5,11 +5,15 @@ import ABSMovies.entity.User;
 import ABSMovies.exception.ApiUserException;
 import ABSMovies.repository.FavoriteRepository;
 import ABSMovies.repository.UserRepository;
+import ABSMovies.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -17,17 +21,19 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, FavoriteRepository favoriteRepository) {
+    public UserService(UserRepository userRepository, FavoriteRepository favoriteRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.favoriteRepository = favoriteRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public User getUserFromDB(User user){
-        return userRepository.getUserByEmail(user.getEmail())
+    public User getUserFromDB(CustomUserDetails user){
+        return userRepository.getUserByEmail(user.getUsername())
                 .orElseThrow(() ->
-                        new ApiUserException("User with email " + user.getEmail() + " doesn't exist!"));
+                        new UsernameNotFoundException("User with email " + user.getUsername() + " doesn't exist!"));
     }
 
     public Boolean addUser(User user){
@@ -35,11 +41,12 @@ public class UserService {
                 .ifPresent(userFromDB ->
                         {throw new ApiUserException("User with email " + userFromDB.getEmail() + " is already exist!");});
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return true;
     }
 
-    public Boolean addFavorite(User user, Long film_id){
+    public Boolean addFavorite(CustomUserDetails user, Long film_id){
 
         User userFromDB = getUserFromDB(user);
 
@@ -61,7 +68,7 @@ public class UserService {
        return true;
     }
 
-    public Boolean deleteFavorite(User user, Long film_id){
+    public Boolean deleteFavorite(CustomUserDetails user, Long film_id){
 
         User userFromDB = getUserFromDB(user);
 
@@ -77,12 +84,19 @@ public class UserService {
         return true;
     }
 
-    public Set<Long> getFavorite(User user){
-        Set<Favorite> favorites = userRepository.getUserByEmail(user.getEmail())
+    public Set<Long> getFavorite(CustomUserDetails user){
+
+        Set<Favorite> favorites = userRepository.getUserByEmail(user.getUsername())
                 .map(User::getFavorites).orElseThrow();
 
         Set<Long> setOfFavorites = new HashSet<>();
         favorites.forEach(favorite -> setOfFavorites.add(favorite.getFilmId()));
         return setOfFavorites;
+    }
+
+    public CustomUserDetails getUserFromSecurityContextHolder() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        CustomUserDetails user = (CustomUserDetails) context.getAuthentication().getPrincipal();
+        return user;
     }
 }

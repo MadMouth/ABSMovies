@@ -5,8 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,8 +14,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ExceptionEntity apiException = new ExceptionEntity(
                 e.getMessage(),
-                status,
-                ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
+                status
         );
 
         return new ResponseEntity<>(apiException, status);

@@ -10,6 +10,7 @@ REST API for the film searching service [ABSMovies](https://github.com/Maksewsha
 * Spring Security
 * Spring Data JPA
 * MySQL Driver
+* Json Web Token
 
 ### Services
 * Yandex Cloud
