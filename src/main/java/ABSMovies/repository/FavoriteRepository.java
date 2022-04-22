@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
-        public Optional<Favorite> getFavoriteByFilmId(Long film_id);
+        Optional<Favorite> getFavoriteByFilmId(Long film_id);
 }
