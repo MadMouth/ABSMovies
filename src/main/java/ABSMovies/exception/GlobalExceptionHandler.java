@@ -11,7 +11,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = ApiUserException.class)
     public ResponseEntity<Object> handlerApiUserException(ApiUserException e){
-        HttpStatus status = HttpStatus.NOT_FOUND;
+        HttpStatus status = HttpStatus.CONFLICT;
         ExceptionEntity apiException = new ExceptionEntity(
                 e.getMessage(),
                 status
