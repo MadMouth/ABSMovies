@@ -13,7 +13,8 @@ REST API for the film searching service [ABSMovies](https://github.com/Maksewsha
 * Json Web Token
 
 ### Services
-* Yandex Cloud
+* Docker
+* Timeweb Cloud
 
 
 ### Set up the project
@@ -38,6 +39,6 @@ find the compiled .class files in the target/classes directory.
 
 To execute the JAR file run:
 
-`java -jar target/ABSMovies-0.0.1-SNAPSHOT.jar`
+`java -jar target/ABSMovies-0.0.2-SNAPSHOT.jar`
 
 
