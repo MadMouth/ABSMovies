@@ -1,6 +1,7 @@
 # ABSMovies
 
 REST API for the film searching service [ABSMovies](https://github.com/Maksewsha/ABSMovies).
+JWT-based user authentication system.
 
 # Technologies
 
